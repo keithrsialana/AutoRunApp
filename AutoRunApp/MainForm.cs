@@ -23,13 +23,20 @@ namespace AutoRunApp
                 ofd.Filter = "Executiables (*.exe)|*.exe|Batch Script (*.bat)|*.bat";
                 if (ofd.ShowDialog() == DialogResult.OK)
                 {
+                    // Sets filename strings
                     processFileName = ofd.SafeFileName;
                     processFilePath = ofd.FileName;
                     txtFileName.Text = ofd.FileName;
+
+                    // Adds to log
                     logBox.Text += $"FILE SELECTED: \t{ofd.SafeFileName} AT {ofd.FileName} \r\n";
                     selectedProcess = new Process();
                     selectedProcess.StartInfo.FileName = txtFileName.Text;
+                    
+                    // Sets process class with selected process
                     pm = new ProcessManipulation(selectedProcess);
+
+                    // Enables related buttons
                     btnStart.Enabled = true;
                     btnAutorun.Enabled = true;
                 }
@@ -49,6 +56,7 @@ namespace AutoRunApp
             {
                 logBox.Text += $"PROCESS STARTED: \t{processFileName}\r\nWATCHING PROCESS...\r\n";
             }
+            // Starts the timer to watch the process while it's running
             timer1.Start();
             btnStart.Enabled = false;
             btnEnd.Enabled = true;
@@ -59,6 +67,8 @@ namespace AutoRunApp
             if (!pm.CheckProcess())
             {
                 logBox.Text += $"PROCESS CLOSED: \t{processFileName}\r\n";
+
+                // while watching the process, restarts the process if closed and autoRun is set as true
                 if (autoRun)
                 {
                     logBox.Text += $"PROCESS RESTARTING: \t{processFileName} restarting...\r\n";
@@ -69,6 +79,7 @@ namespace AutoRunApp
                 }
                 else
                 {
+                    // stops watching the process
                     timer1.Stop();
                     btnEnd.Enabled = false;
                     btnStart.Enabled = true;
@@ -78,6 +89,7 @@ namespace AutoRunApp
 
         private void btnAutorun_Click(object sender, EventArgs e)
         {
+            // toggles the AutoRun button
             if (!autoRun)
             {
                 autoRun = true;
@@ -93,6 +105,7 @@ namespace AutoRunApp
 
         private void btnEnd_Click(object sender, EventArgs e)
         {
+            // Ends the process and stop watching
             if (pm.EndProcess())
             {
                 logBox.Text += $"PROCESS STOPPED: \t{processFileName}\r\n";
